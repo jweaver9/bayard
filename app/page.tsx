@@ -1,26 +1,68 @@
 'use client';
- 
+
+import React, { useState } from 'react';
+import { TextField, Button, Box, Typography, CircularProgress, List, ListItem, ListItemText } from '@mui/material';
 import { useChat } from 'ai/react';
- 
+
+// Define some prompt examples for users to get started or to use in the chat.
+const promptExamples = [
+  "Write a short story about a dragon.",
+  "Explain quantum computing to a 10-year-old.",
+  "What's the latest news on Mars exploration?",
+  "Give me tips for beginner yoga poses."
+];
+
 export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit } = useChat();
+  const [loading, setLoading] = useState(false);
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    // Directly submit the text input without image handling
+    handleSubmit(e);
+    setLoading(false);
+  };
+
   return (
-    <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
-      {messages.map(m => (
-        <div key={m.id} className="whitespace-pre-wrap">
-          {m.role === 'user' ? 'User: ' : 'AI: '}
-          {m.content}
-        </div>
-      ))}
- 
-      <form onSubmit={handleSubmit}>
-        <input
-          className="fixed bottom-0 w-full max-w-md p-2 mb-8 border border-gray-300 rounded shadow-xl"
+    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2, maxHeight: '100vh', overflow: 'hidden' }}>
+      <Typography variant="h4" sx={{ textAlign: 'center' }}>AI Chat</Typography>
+
+      {/* Display messages */}
+      <Box sx={{ flex: 1, overflowY: 'auto' }}>
+        <List>
+          {messages.map((m, index) => (
+            <ListItem key={index} alignItems="flex-start">
+              <ListItemText primary={m.role === 'user' ? 'You:' : 'AI:'} secondary={m.content} />
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+
+      {/* Allow users to pick a prompt example */}
+      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'center' }}>
+        {promptExamples.map((example, i) => (
+          <Button key={i} variant="outlined" onClick={() => handleInputChange({ target: { value: example } })}>
+            Use Example
+          </Button>
+        ))}
+      </Box>
+
+      {/* Input form */}
+      <Box component="form" onSubmit={handleFormSubmit} sx={{ display: 'flex', gap: 1 }}>
+        <TextField
+          fullWidth
+          variant="outlined"
           value={input}
-          placeholder="Say something..."
           onChange={handleInputChange}
+          placeholder="Ask me anything..."
+          disabled={loading}
         />
-      </form>
-    </div>
+        <Button type="submit" variant="contained" disabled={loading}>
+          {loading ? <CircularProgress size={24} /> : 'Send'}
+        </Button>
+      </Box>
+    </Box>
   );
 }
