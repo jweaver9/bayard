@@ -1,68 +1,115 @@
-'use client';
-
-import React, { useState } from 'react';
-import { TextField, Button, Box, Typography, CircularProgress, List, ListItem, ListItemText } from '@mui/material';
+import React from 'react';
 import { useChat } from 'ai/react';
+import { TextField, Button, Box, Typography, CircularProgress, List, ListItem, ListItemText, Paper } from '@mui/material';
+import { styled } from '@mui/system';
 
-// Define some prompt examples for users to get started or to use in the chat.
-const promptExamples = [
-  "Write a short story about a dragon.",
-  "Explain quantum computing to a 10-year-old.",
-  "What's the latest news on Mars exploration?",
-  "Give me tips for beginner yoga poses."
-];
+const ChatContainer = styled(Box)(({ theme }) => ({
+  backgroundColor: theme.palette.grey[100],
+  padding: theme.spacing(3),
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(2),
+  maxHeight: '100vh',
+  overflow: 'auto',
+}));
+
+const ChatHeader = styled(Typography)(({ theme }) => ({
+  textAlign: 'center',
+  marginBottom: theme.spacing(2),
+  color: theme.palette.primary.main,
+}));
+
+const ChatMessages = styled(Paper)(({ theme }) => ({
+  flexGrow: 1,
+  overflowY: 'auto',
+  padding: theme.spacing(2),
+  backgroundColor: theme.palette.background.paper,
+}));
+
+const UserMessage = styled(ListItemText)(({ theme }) => ({
+  textAlign: 'right',
+  '& .MuiListItemText-primary': {
+    color: theme.palette.success.main,
+  },
+}));
+
+const AIMessage = styled(ListItemText)(({ theme }) => ({
+  textAlign: 'left',
+  '& .MuiListItemText-primary': {
+    color: theme.palette.info.main,
+  },
+}));
+
+const ChatForm = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  gap: theme.spacing(1),
+  alignItems: 'center',
+}));
+
+const SendButton = styled(Button)(({ theme }) => ({
+  backgroundColor: theme.palette.secondary.main,
+  color: theme.palette.secondary.contrastText,
+  '&:hover': {
+    backgroundColor: theme.palette.secondary.dark,
+  },
+}));
 
 export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit } = useChat();
-  const [loading, setLoading] = useState(false);
+  const [completion, setCompletion] = React.useState<null | string>(null); // Declare the 'completion' state variable and the 'setCompletion' function
 
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    const [messages, setMessages] = React.useState([]); // Declare the 'messages' state variable and the 'setMessages' function
+
+    const error = null; // Declare the variable 'error'
     e.preventDefault();
-    setLoading(true);
-    
-    // Directly submit the text input without image handling
-    handleSubmit(e);
-    setLoading(false);
+    handleSubmit(e as React.FormEvent<HTMLFormElement>); // Specify the correct type for the event parameter
+
+    if (!error) {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        body: JSON.stringify({ input }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMessages((prevMessages: never[]) => [...prevMessages, { role: 'system', content: input}, {role: 'user', content: input }, { role: 'assistant', content: data.message }] as never[]);
+      }
+    }
   };
 
   return (
-    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2, maxHeight: '100vh', overflow: 'hidden' }}>
-      <Typography variant="h4" sx={{ textAlign: 'center' }}>AI Chat</Typography>
+    <ChatContainer>
+      <ChatHeader variant="h4">AI Chat</ChatHeader>
 
-      {/* Display messages */}
-      <Box sx={{ flex: 1, overflowY: 'auto' }}>
+      <ChatMessages elevation={3}>
         <List>
           {messages.map((m, index) => (
-            <ListItem key={index} alignItems="flex-start">
-              <ListItemText primary={m.role === 'user' ? 'You:' : 'AI:'} secondary={m.content} />
+            <ListItem key={index}>
+              {m.role === 'user' ? (
+                <UserMessage primary="You:" secondary={m.content} />
+              ) : (
+                <AIMessage primary="AI:" secondary={m.content} />
+              )}
             </ListItem>
           ))}
         </List>
-      </Box>
+      </ChatMessages>
 
-      {/* Allow users to pick a prompt example */}
-      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'center' }}>
-        {promptExamples.map((example, i) => (
-          <Button key={i} variant="outlined" onClick={() => handleInputChange({ target: { value: example } })}>
-            Use Example
-          </Button>
-        ))}
-      </Box>
 
-      {/* Input form */}
-      <Box component="form" onSubmit={handleFormSubmit} sx={{ display: 'flex', gap: 1 }}>
+      <ChatForm component="form" onSubmit={handleFormSubmit}>
         <TextField
           fullWidth
           variant="outlined"
           value={input}
           onChange={handleInputChange}
           placeholder="Ask me anything..."
-          disabled={loading}
+          disabled={completion !== null}
         />
-        <Button type="submit" variant="contained" disabled={loading}>
-          {loading ? <CircularProgress size={24} /> : 'Send'}
-        </Button>
-      </Box>
-    </Box>
+        <SendButton type="submit" variant="contained" disabled={completion !== null}>
+          {completion !== null ? <CircularProgress size={24} /> : 'Send'}
+        </SendButton>
+      </ChatForm>
+    </ChatContainer>
   );
 }
