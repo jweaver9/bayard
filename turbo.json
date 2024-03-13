@@ -1,24 +1,51 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
-  "globalEnv": [
-    "NEXT_PUBLIC_PLAUSIBLE_DATA_DOMAIN",
-    "NEXT_PUBLIC_IS_LATEST",
-    "NEXT_PUBLIC_IS_CANARY",
-    "VERCEL_GIT_COMMIT_REF",
-    "NEXT_PUBLIC_BASE_URL",
-    "NODE_ENV"
-  ],
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "env": [
+        "ANTHROPIC_API_KEY",
+        "AWS_REGION",
+        "AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY",
+        "COHERE_API_KEY",
+        "GOOGLE_API_KEY",
+        "HUGGINGFACE_API_KEY",
+        "MISTRAL_API_KEY",
+        "OPENAI_API_KEY",
+        "OPENAI_API_BASE",
+        "PERPLEXITY_API_KEY",
+        "REPLICATE_API_KEY",
+        "NODE_ENV",
+        "ASSISTANT_ID",
+        "INKEEP_API_KEY",
+        "INKEEP_INTEGRATION_ID",
+        "VERCEL_URL"
+      ],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
-    "lint": {},
-    "test": {},
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "type-check": {
+      "dependsOn": ["^build", "build"]
+    },
+    "test": {
+      "dependsOn": ["^build", "build"]
+    },
+    "publint": {
+      "dependsOn": ["^build", "build"]
+    },
+    "clean": {
+      "dependsOn": ["^clean"]
+    },
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "prettier-check": {},
+    "integration-test": {
+      "dependsOn": ["^build", "build"]
     }
   }
 }

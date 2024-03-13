@@ -1,42 +1,43 @@
-# `next` recipe
+# Vercel AI SDK, Next.js, LangChain, OpenAI Chat Example
 
-The `next` recipe showcases one of the most powerful ways to implement Puck using to provide an authoring tool for any route in your Next app.
+This example shows how to use the [Vercel AI SDK](https://sdk.vercel.ai/docs) with [Next.js](https://nextjs.org/), [LangChain](https://js.langchain.com), and [OpenAI](https://openai.com) to create a ChatGPT-like AI-powered streaming chat bot.
 
-## Demonstrates
+## Deploy your own
 
-- Next.js 13 App Router implementation
-- JSON database implementation with HTTP API
-- Catch-all routes to use puck for any route on the platform
-- Incremental static regeneration (ISR) for all Puck pages
+Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=ai-sdk-example):
 
-## Usage
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fai%2Ftree%2Fmain%2Fexamples%2Fnext-langchain&env=OPENAI_API_KEY&envDescription=OpenAI%20API%20Key&envLink=https%3A%2F%2Fplatform.openai.com%2Faccount%2Fapi-keys&project-name=ai-chat-langchain&repository-name=next-ai-chat-langchain)
 
-Run the generator and enter `next` when prompted
+## How to use
 
-```
-npx create-puck-app my-app
-```
+Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
 
-Start the server
-
-```
-yarn dev
+```bash
+npx create-next-app --example https://github.com/vercel/ai/tree/main/examples/next-langchain next-langchain-app
 ```
 
-Navigate to the homepage at https://localhost:3000. To edit the homepage, access the Puck editor at https://localhost:3000/edit.
+```bash
+yarn create next-app --example https://github.com/vercel/ai/tree/main/examples/next-langchain next-langchain-app
+```
 
-You can do this for any route on the application, **even if the page doesn't exist**. For example, visit https://localhost:3000/hello/world and you'll receive a 404. You can author and publish a page by visiting https://localhost:3000/hello/world/edit. After publishing, go back to the original URL to see your page.
+```bash
+pnpm create next-app --example https://github.com/vercel/ai/tree/main/examples/next-langchain next-langchain-app
+```
 
-## Using this recipe
+To run the example locally you need to:
 
-To adopt this recipe you will need to:
+1. Sign up at [OpenAI's Developer Platform](https://platform.openai.com/signup).
+2. Go to [OpenAI's dashboard](https://platform.openai.com/account/api-keys) and create an API KEY.
+3. Set the required OpenAI environment variable as the token value as shown [the example env file](./.env.local.example) but in a new file called `.env.local`.
+4. `pnpm install` to install the required dependencies.
+5. `pnpm dev` to launch the development server.
 
-- **IMPORTANT** Add authentication to `/edit` routes. This can be done by modifying the example API routes in `/app/puck/api/route.ts` and server component in `/app/puck/[...puckPath]/page.tsx`. **If you don't do this, Puck will be completely public.**
-- Integrate your database into the API calls in `/app/puck/api/route.ts`
-- Implement a custom puck configuration in `puck.config.tsx`
+## Learn More
 
-By default, this recipe will generate static pages by setting `dynamic` to [`force-static`](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config#dynamic) in the `/app/[...puckPath]/page.tsx`. This will strip headers and cookies. If you need dynamic pages, you can delete this.
+To learn more about LangChain, OpenAI, Next.js, and the Vercel AI SDK take a look at the following resources:
 
-## License
-
-MIT © [Measured Co.](https://github.com/measuredco)
+- [Vercel AI SDK docs](https://sdk.vercel.ai/docs) - learn mode about the Vercel AI SDK
+- [Vercel AI Playground](https://play.vercel.ai) - compare and tune 20+ AI models side-by-side
+- [LangChain Documentation](https://js.langchain.com/docs) - learn about LangChain
+- [OpenAI Documentation](https://platform.openai.com/docs) - learn about OpenAI features and API.
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
